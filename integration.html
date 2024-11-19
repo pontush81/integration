@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prismodell för Integrationer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .column {
+            width: 48%;
+            padding: 10px;
+        }
+        .column h2 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 5px;
+            margin-top: 5px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .highlight {
+            background-color: #dbe9ff;
+        }
+        .currency::after {
+            content: " kr";
+            font-weight: bold;
+        }
+        .currency {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            min-width: 120px;
+        }
+    </style>
+</head>
+<body>
+    <h1 align="center">Prismodell för Integrationer</h1>
+
+    <div class="container">
+        <div class="column">
+            <h2>Intäkt</h2>
+            <label for="initialFee">Pris = Engångsavgift (SEK):</label>
+            <input type="number" id="initialFee" value="0">
+            
+            <label for="monthlyFee">Abonnemang mån (SEK):</label>
+            <input type="number" id="monthlyFee" value="1">
+            
+            <label for="indexRate">Årlig indexering pris (%):</label>
+            <input type="number" id="indexRate" value="10.00" step="0.1">
+
+            <label for="numCustomers">Antal kunder på integrationen:</label>
+            <input type="number" id="numCustomers" value="1">
+        </div>
+
+        <div class="column">
+            <h2>Kostnad</h2>
+            <label for="developmentHours">Utvecklingstimmar:</label>
+            <input type="number" id="developmentHours" value="0">
+            
+            <label for="hourlyCost">Verklig timkostnad (SEK):</label>
+            <input type="number" id="hourlyCost" value="0">
+            
+            <label for="annualMaintenanceGeneric">Årligt underhåll i timmar generic adapter:</label>
+            <input type="number" id="annualMaintenanceGeneric" value="0">
+            
+            <label for="annualMaintenanceCustom">Årligt underhåll i timmar per "custom need":</label>
+            <input type="number" id="annualMaintenanceCustom" value="0">
+            
+            <label for="laborCostIncrease">Årlig kostnadsökning arbetskraft (%):</label>
+            <input type="number" id="laborCostIncrease" value="0" step="0.1">
+        </div>
+    </div>
+    <button onclick="calculateProfit()">Beräkna</button>
+    
+    <h2>Resultat:</h2>
+    <table id="resultTable">
+        <thead>
+            <tr>
+                <th>År</th>
+                <th>Kostnad (SEK)</th>
+                <th>Intäkt (SEK)</th>
+                <th>Årets Resultat (SEK)</th>
+                <th>Ack Resultat (SEK)</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script>
+        function calculateProfit() {
+            const initialFee = parseFloat(document.getElementById('initialFee').value);
+            const monthlyFee = parseFloat(document.getElementById('monthlyFee').value);
+            const indexRate = parseFloat(document.getElementById('indexRate').value) / 100;
+            const developmentHours = parseFloat(document.getElementById('developmentHours').value);
+            const hourlyCost = parseFloat(document.getElementById('hourlyCost').value);
+            const annualMaintenanceGeneric = parseFloat(document.getElementById('annualMaintenanceGeneric').value);
+            const annualMaintenanceCustom = parseFloat(document.getElementById('annualMaintenanceCustom').value);
+            const numCustomers = parseInt(document.getElementById('numCustomers').value, 10);
+            const laborCostIncrease = parseFloat(document.getElementById('laborCostIncrease').value) / 100;
+
+            const developmentCost = developmentHours * hourlyCost;
+            let currentAnnualFee = monthlyFee * 12;
+            let currentAnnualMaintenanceCost = annualMaintenanceCustom * hourlyCost;
+
+            let cumulativeProfit = 0;
+
+            const resultTableBody = document.getElementById('resultTable').getElementsByTagName('tbody')[0];
+            resultTableBody.innerHTML = '';
+
+            for (let year = 1; year <= 10; year++) {
+                const revenue = (year === 1 ? initialFee + currentAnnualFee : currentAnnualFee) * numCustomers;
+                
+                // Calculate cost, omitting annual maintenance costs for the first year
+                let cost = (year === 1) ? developmentCost : currentAnnualMaintenanceCost * numCustomers;
+                
+                // Include the generic adapter maintenance cost if there are customers and it's not the first year
+                if (year > 1 && numCustomers > 0) {
+                    cost += annualMaintenanceGeneric * hourlyCost;
+                }
+
+                const yearProfit = revenue - cost;
+                cumulativeProfit += yearProfit;
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${year}</td>
+                    <td class="currency">${cost.toFixed(0).toLocaleString('sv-SE')}</td>
+                    <td class="currency">${revenue.toFixed(0).toLocaleString('sv-SE')}</td>
+                    <td class="highlight currency">${yearProfit.toFixed(0).toLocaleString('sv-SE')}</td>
+                    <td class="highlight currency">${cumulativeProfit.toFixed(0).toLocaleString('sv-SE')}</td>
+                `;
+                resultTableBody.appendChild(row);
+
+                currentAnnualFee *= (1 + indexRate);
+                currentAnnualMaintenanceCost *= (1 + laborCostIncrease);
+            }
+        }
+    </script>
+</body>
+</html>
