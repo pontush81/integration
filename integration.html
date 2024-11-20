@@ -99,6 +99,7 @@
     </div>
     <button onclick="calculateProfit()">Beräkna</button>
     <button onclick="copyToClipboard()">Kopiera Resultat</button>
+    <button onclick="copyScriptToClipboard()">Kopiera Google Sheets Script</button>
     
     <h2>Resultat:</h2>
     <table id="resultTable">
@@ -173,6 +174,55 @@
                 alert('Resultaten är kopierade till urklipp och du kan nu klistra in dem i ditt Google Sheets.');
             }).catch(err => {
                 console.error('Fel vid kopiering till urklipp:', err);
+            });
+        }
+
+        function copyScriptToClipboard() {
+            const scriptContent = `
+function calculateROI() {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    sheet.clear(); // Rensa för att starta om beräkning
+
+    // Sätt rubriker
+    sheet.appendRow(["År", "Kostnad (SEK)", "Intäkt (SEK)", "Årets Resultat (SEK)", "Ack Resultat (SEK)"]);
+
+    var initialFee = 1000; // Sätt dessa till värden från ditt formulär om du vill dynamiskt sätta dem
+    var monthlyFee = 100;
+    var indexRate = 0.10;
+    var developmentHours = 0;
+    var hourlyCost = 100;
+    var annualMaintenanceGeneric = 0;
+    var annualMaintenanceCustom = 0;
+    var numCustomers = 1;
+    var laborCostIncrease = 0;
+    
+    var developmentCost = developmentHours * hourlyCost;
+    var currentAnnualFee = monthlyFee * 12;
+    var currentAnnualMaintenanceCost = annualMaintenanceCustom * hourlyCost;
+    var cumulativeProfit = 0;
+    
+    for (var year = 1; year <= 10; year++) {
+        var revenue = (year === 1 ? initialFee + currentAnnualFee : currentAnnualFee) * numCustomers;
+        var cost = (year === 1) ? developmentCost : currentAnnualMaintenanceCost * numCustomers;
+        if (year > 1 && numCustomers > 0) {
+            cost += annualMaintenanceGeneric * hourlyCost;
+        }
+        var yearProfit = revenue - cost;
+        cumulativeProfit += yearProfit;
+        
+        // Lägg till rad i Google Sheet med resultaten
+        sheet.appendRow([year, cost, revenue, yearProfit, cumulativeProfit]);
+        
+        // Uppdatera årlig avgift och kostnad
+        currentAnnualFee *= (1 + indexRate);
+        currentAnnualMaintenanceCost *= (1 + laborCostIncrease);
+    }
+}
+`;
+            navigator.clipboard.writeText(scriptContent).then(() => {
+                alert('Skriptet är kopierat! Du kan nu klistra in det i ett Google Sheets-skript under Extensions > Apps Script.');
+            }).catch(err => {
+                console.error('Fel vid kopiering:', err);
             });
         }
     </script>
