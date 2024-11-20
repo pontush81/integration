@@ -100,7 +100,6 @@
     <button onclick="calculateProfit()">Beräkna</button>
     <button onclick="copyToClipboard()">Kopiera Resultat</button>
     
-    <div id="textResult" style="display:none;"></div>
     <h2>Resultat:</h2>
     <table id="resultTable">
         <thead>
@@ -117,6 +116,8 @@
     </table>
 
     <script>
+        let textResult = '';
+
         function calculateProfit() {
             const initialFee = parseFloat(document.getElementById('initialFee').value);
             const monthlyFee = parseFloat(document.getElementById('monthlyFee').value);
@@ -137,7 +138,7 @@
             const resultTableBody = document.getElementById('resultTable').getElementsByTagName('tbody')[0];
             resultTableBody.innerHTML = '';
 
-            let textResult = 'År,Kostnad (SEK),Intäkt (SEK),Årets Resultat (SEK),Ack Resultat (SEK)\n';
+            textResult = 'År\tKostnad (SEK)\tIntäkt (SEK)\tÅrets Resultat (SEK)\tAck Resultat (SEK)\n';
 
             for (let year = 1; year <= 10; year++) {
                 const revenue = (year === 1 ? initialFee + currentAnnualFee : currentAnnualFee) * numCustomers;
@@ -160,18 +161,14 @@
                 `;
                 resultTableBody.appendChild(row);
 
-                textResult += `${year},${cost},${revenue},${yearProfit},${cumulativeProfit}\n`;
+                textResult += `${year}\t${cost}\t${revenue}\t${yearProfit}\t${cumulativeProfit}\n`;
 
                 currentAnnualFee *= (1 + indexRate);
                 currentAnnualMaintenanceCost *= (1 + laborCostIncrease);
             }
-
-            document.getElementById('textResult').innerText = textResult;
-            document.getElementById('textResult').style.display = 'block';
         }
 
         function copyToClipboard() {
-            const textResult = document.getElementById('textResult').innerText;
             navigator.clipboard.writeText(textResult).then(() => {
                 alert('Resultaten är kopierade till urklipp och du kan nu klistra in dem i ditt Google Sheets.');
             }).catch(err => {
