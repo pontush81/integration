@@ -97,15 +97,15 @@
             margin-top: 20px;
             margin-right: 10px;
             cursor: pointer;
-            background-color: #ff8c00; /* Använd orange färg */
-            color: black;
+            background-color: black;
+            color: white;
             border: none;
             border-radius: 5px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
         button:hover {
-            background-color: #ffa726; /* Ljusare orange vid hover */
+            background-color: grey; /* Ljusare vid hover */
             transform: translateY(-2px);
         }
     </style>
@@ -118,10 +118,10 @@
     <div class="container">
         <div class="column">
             <h2>Intäkt</h2>
-            <label for="initialFee">Pris = Engångsavgift (SEK):</label>
+            <label for="initialFee">Pris till kund (engångsavgift):</label>
             <input type="number" id="initialFee" value="0">
             
-            <label for="monthlyFee">Abonnemang mån (SEK):</label>
+            <label for="monthlyFee">Abonnemang/mån:</label>
             <input type="number" id="monthlyFee" value="0">
             
             <label for="indexRate">Årlig indexering pris (%):</label>
@@ -136,16 +136,16 @@
             <label for="developmentHours">Utvecklingstimmar:</label>
             <input type="number" id="developmentHours" value="0">
             
-            <label for="hourlyCost">Verklig timkostnad (SEK):</label>
+            <label for="hourlyCost">Verklig timkostnad:</label>
             <input type="number" id="hourlyCost" value="0">
             
-            <label for="annualMaintenanceGeneric">Årligt underhåll i timmar generic adapter:</label>
+            <label for="annualMaintenanceGeneric">Årligt underhåll i timmar för generic adapter:</label>
             <input type="number" id="annualMaintenanceGeneric" value="0">
             
-            <label for="annualMaintenanceCustom">Årligt underhåll i timmar per "custom need":</label>
+            <label for="annualMaintenanceCustom">Årligt underhåll i timmar per custom need:</label>
             <input type="number" id="annualMaintenanceCustom" value="0">
             
-            <label for="laborCostIncrease">Årlig kostnadsökning arbetskraft (%):</label>
+            <label for="laborCostIncrease">Årlig kostnadsökning för arbetskraft (%):</label>
             <input type="number" id="laborCostIncrease" value="0" step="0">
         </div>
     </div>
