@@ -6,31 +6,54 @@
     <title>ROI-kalkylator för Integrationer</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #282c34;
+            padding: 20px;
+            text-align: center;
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .container {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
+            justify-content: space-around;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            border-radius: 8px;
         }
         .column {
-            width: 48%;
-            padding: 10px;
+            width: 45%;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #f9f9fb;
         }
         .column h2 {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            color: #555;
         }
         label {
             display: block;
             margin-top: 10px;
+            font-weight: bold;
+            color: #555;
         }
         input[type="number"] {
             width: 100%;
-            padding: 5px;
+            padding: 10px;
             margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
             box-sizing: border-box;
+            font-size: 14px;
         }
         table {
             width: 100%;
@@ -39,7 +62,7 @@
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
             text-align: center;
             vertical-align: middle;
         }
@@ -47,34 +70,40 @@
             background-color: #f2f2f2;
         }
         .highlight {
-            background-color: #dbe9ff;
+            background-color: #e8f4ff;
         }
         .currency::after {
             content: " kr";
             font-weight: bold;
         }
         .currency {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #333;
             min-width: 120px;
         }
         button {
             padding: 10px 20px;
             font-size: 16px;
+            margin-top: 20px;
+            margin-right: 10px;
             cursor: pointer;
-            background-color: #4CAF50; /* Grön färg */
+            background-color: #007bff;
             color: white;
             border: none;
             border-radius: 5px;
-            margin-right: 10px; /* Mellanrum mellan knappar */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
         button:hover {
-            background-color: #45a049; /* Mörkare grön vid hover */
+            background-color: #0069d9;
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
-    <h1 align="center">ROI-kalkylator för Integrationer</h1>
+    <header>
+        <h1>ROI-kalkylator för Integrationer</h1>
+    </header>
 
     <div class="container">
         <div class="column">
@@ -110,11 +139,14 @@
             <input type="number" id="laborCostIncrease" value="0" step="0">
         </div>
     </div>
-    <button onclick="calculateProfit()">Beräkna</button>
-    <button onclick="copyToClipboard()">Kopiera Resultat</button>
-    <button onclick="openGoogleSheets()">Öppna Google Sheets</button>
+
+    <div style="text-align:center;">
+        <button onclick="calculateProfit()">Beräkna</button>
+        <button onclick="copyToClipboard()">Kopiera Resultat</button>
+        <button onclick="openGoogleSheets()">Öppna Google Sheets</button>
+    </div>
     
-    <h2>Resultat:</h2>
+    <h2 style="text-align:center; margin-top:20px;">Resultat:</h2>
     <table id="resultTable">
         <thead>
             <tr>
@@ -155,27 +187,27 @@
             textResult = 'År\tKostnad (SEK)\tIntäkt (SEK)\tÅrets Resultat (SEK)\tAck Resultat (SEK)\n';
 
             for (let year = 1; year <= 10; year++) {
-                const revenue = (year === 1 ? initialFee + currentAnnualFee : currentAnnualFee) * numCustomers;
+                const revenue = Math.round((year === 1 ? initialFee + currentAnnualFee : currentAnnualFee) * numCustomers);
                 
-                let cost = (year === 1) ? developmentCost : currentAnnualMaintenanceCost * numCustomers;
+                let cost = Math.round((year === 1) ? developmentCost : currentAnnualMaintenanceCost * numCustomers);
                 if (year > 1 && numCustomers > 0) {
-                    cost += annualMaintenanceGeneric * hourlyCost;
+                    cost += Math.round(annualMaintenanceGeneric * hourlyCost);
                 }
 
-                const yearProfit = revenue - cost;
+                const yearProfit = Math.round(revenue - cost);
                 cumulativeProfit += yearProfit;
 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${year}</td>
-                    <td class="currency">${cost.toFixed(0).toLocaleString('sv-SE')}</td>
-                    <td class="currency">${revenue.toFixed(0).toLocaleString('sv-SE')}</td>
-                    <td class="highlight currency">${yearProfit.toFixed(0).toLocaleString('sv-SE')}</td>
-                    <td class="highlight currency">${cumulativeProfit.toFixed(0).toLocaleString('sv-SE')}</td>
+                    <td class="currency">${cost.toLocaleString('sv-SE')}</td>
+                    <td class="currency">${revenue.toLocaleString('sv-SE')}</td>
+                    <td class="highlight currency">${yearProfit.toLocaleString('sv-SE')}</td>
+                    <td class="highlight currency">${cumulativeProfit.toLocaleString('sv-SE')}</td>
                 `;
                 resultTableBody.appendChild(row);
 
-                textResult += `${year}\t${cost}\t${revenue}\t${yearProfit}\t${cumulativeProfit}\n`;
+                textResult += `${year}\t${cost.toLocaleString('sv-SE')}\t${revenue.toLocaleString('sv-SE')}\t${yearProfit.toLocaleString('sv-SE')}\t${cumulativeProfit.toLocaleString('sv-SE')}\n`;
 
                 currentAnnualFee *= (1 + indexRate);
                 currentAnnualMaintenanceCost *= (1 + laborCostIncrease);
